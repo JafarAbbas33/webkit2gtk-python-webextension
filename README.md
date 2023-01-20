@@ -35,6 +35,13 @@ the following modules included with WebKit2GTK+ can be used:
 Any other module exposed by GObject-Introspection can be used, as long as they
 do not use the `WebKit`, or `WebKit2` modules.
 
+You **MIGHT** be able to find your libpythonX.X.so using the following code:
+```from distutils import sysconfig;
+import os.path as op;
+v = sysconfig.get_config_vars();
+fpaths = [op.join(v[pv], v['LDLIBRARY']) for pv in ('LIBDIR', 'LIBPL')]; 
+print(list(filter(op.exists, fpaths))[0])
+```
 
 Trying it out
 -------------
