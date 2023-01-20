@@ -11,7 +11,11 @@ WEB_EXT_FLAGS := $(shell pkg-config ${PKG_MODULES} --cflags)
 WEB_EXT_LIBS  := $(shell pkg-config ${PKG_MODULES} --libs)
 
 CPPFLAGS += ${WEB_EXT_FLAGS}
-LDLIBS   += ${WEB_EXT_LIBS}
+# Link your python shared library here
+LDLIBS   += ${WEB_EXT_LIBS} /usr/lib/x86_64-linux-gnu/libpython3.8.so
+# Old:
+# LDLIBS   += ${WEB_EXT_LIBS}
+
 
 all: pythonloader.so
 

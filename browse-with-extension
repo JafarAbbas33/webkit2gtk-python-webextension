@@ -13,9 +13,24 @@ gi.require_version("WebKit2", "4.0")
 from gi.repository import WebKit2, Gtk, GLib
 from os import path
 import sys
+import os
+
+def fix_paths():
+    if '/' not in sys.argv[0]:
+        return
+    script_location = sys.argv[0].split('/')
+    script_location.pop(-1)
+    cwd = '/'.join(script_location)
+    os.chdir(cwd)
+fix_paths()
+
+# os.environ['LD_PRELOAD'] = '/usr/lib/x86_64-linux-gnu/libpython3.8.so'
+# os.environ['PYTHONPATH'] = os.getcwd()
 
 mydir = path.abspath(path.dirname(__file__))
+mydir = 'extensions'
 print("Extension directory:", mydir)
+
 
 ctx = WebKit2.WebContext.get_default()
 ctx.set_web_extensions_directory(mydir)
@@ -25,7 +40,7 @@ wnd = Gtk.Window()
 web = WebKit2.WebView.new_with_context(ctx)
 wnd.connect("destroy", Gtk.main_quit)
 wnd.add(web)
-wnd.set_default_size(1152, 800)
+wnd.set_default_size(500, 400)
 wnd.show_all()
 
 def on_load_changed(webview, event):
@@ -38,12 +53,14 @@ def on_load_changed(webview, event):
 def on_load_failed(webview, event, url, error):
     print("Error loading", url, "-", error)
 
-web.connect("load-changed", on_load_changed)
+# web.connect("load-changed", on_load_changed)
 web.connect("load-failed", on_load_failed)
 
 if len(sys.argv) > 1:
     web.load_uri(sys.argv[1])
 else:
-    web.load_uri("http://ddg.gg")
+    url = 'http://ddg.gg'
+    # url = 'http://127.0.0.1:5000'
+    web.load_uri(url)
 
 Gtk.main()

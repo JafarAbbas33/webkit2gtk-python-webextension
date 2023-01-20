@@ -9,6 +9,7 @@
 #include <webkit2/webkit-web-extension.h>
 #include <pygobject.h>
 #include <stdarg.h>
+// #include <dlfcn.h>
 
 /*
  * XXX: Hacky workaround ahead!
@@ -20,6 +21,7 @@
  * pygi_value_to_py_structured_type() —also private—, and finally that
  * in turn calls _pygi_struct_new_from_g_type() as initially desired.
  */
+
 static PyObject*
 g_variant_to_pyobject (GVariant *variant)
 {
@@ -61,12 +63,32 @@ py_object_cleanup(void *ptr)
 
 
 /* This would be "extension.py" from the source directory. */
-static const char *extension_name = "extension";
+// static const char *extension_name = "./extensions/extension";
 
+// printf("%f is of type %s\n", 1.5, type_name(realpath("./extensions/extension", NULL)));
+// static const char *extension_name = realpath("./extensions/extension", NULL);
+// char *extension_name = path;
+
+static const char *extension_name = "extension";
 
 static gboolean
 pygi_require (const gchar *module, ...)
 {
+	char cwd[200];
+	const char* extensions_dir_path = "extensions";
+	const char* cwd2 = getcwd(cwd, sizeof(cwd));
+	char* extensions_dir_full_path = malloc(strlen(cwd2)+strlen(extensions_dir_path) + 2);
+	sprintf(extensions_dir_full_path, "%s/%s", cwd2, extensions_dir_path);
+    // g_print ("\n\n%s\n\n", extensions_dir_full_path);
+    
+	PyObject *sys_path = PySys_GetObject("path");
+	PyList_Append(sys_path, PyUnicode_FromString(extensions_dir_full_path));
+	
+	// PyRun_SimpleString("import sys\nprint(sys.path, '\\n\\n')");
+	g_print ("Count (ABV): %li\n", PySequence_Count(sys_path, PyUnicode_FromString(extensions_dir_full_path)));
+	
+	
+	
     PyObject py_auto *gi_module = PyImport_ImportModule ("gi");
     PY_CHECK_ACT (gi_module, return FALSE, "Could not import 'gi'");
 
@@ -102,6 +124,11 @@ G_MODULE_EXPORT void
 webkit_web_extension_initialize_with_user_data (WebKitWebExtension *extension,
                                                 GVariant           *user_data)
 {
+	// g_printerr ("Initialing...");
+	// Path: /usr/lib/x86_64-linux-gnu/libpython3.8.so
+	// void*const libpython_handle = dlopen("libpython3.8.so", RTLD_LAZY | RTLD_GLOBAL);
+	// dlopen("libpython3.8.so", RTLD_LAZY | RTLD_GLOBAL);
+	// dlopen("/usr/lib/x86_64-linux-gnu/libpython3.8.so", RTLD_LAZY | RTLD_GLOBAL);
     Py_Initialize ();
 
 #if PY_VERSION_HEX < 0x03000000
@@ -138,6 +165,31 @@ webkit_web_extension_initialize_with_user_data (WebKitWebExtension *extension,
      *       create a new module and PyImport_ExecCodeModule() to import it
      *       from a bytecode object.
      */
+    // printf("%f is of type %s\n", 1.5, g_type_name(realpath("./extensions/extension", NULL)));
+	// char *extension_name = realpath("./extensions/extension.py", NULL);
+	// g_print ("\n\n0) %s\n\n", extension_name);
+	
+	// char cwd[PATH_MAX];
+	// const char* cwd2 = getcwd(cwd, sizeof(cwd));
+	// char* extension_name = malloc(strlen(cwd2)+strlen(extension_path) + 2);
+	// sprintf(extension_name, "%s/%s", cwd2, extension_path);
+    // g_print ("\n\n%s\n\n", extension_name);
+	
+	
+	char cwd[200];
+	const char* extensions_dir_path = "extensions";
+	const char* cwd2 = getcwd(cwd, sizeof(cwd));
+	char* extensions_dir_full_path = malloc(strlen(cwd2)+strlen(extensions_dir_path) + 2);
+	sprintf(extensions_dir_full_path, "%s/%s", cwd2, extensions_dir_path);
+    // g_print ("\n\n%s\n\n", extensions_dir_full_path);
+    
+	PyObject *sys_path = PySys_GetObject("path");
+	// PyRun_SimpleString("import sys\nprint(sys.path, '\\n\\n')");
+	
+	g_print ("Count (BEL): %li\n", PySequence_Count(sys_path, PyUnicode_FromString(extensions_dir_full_path)));
+	
+	// PyRun_SimpleString("import sys\nprint(sys.path, '\\n\\n')\n");
+	
     PyObject py_auto *py_filename = PyUnicode_FromString (extension_name);
     PyObject py_auto *py_module = PyImport_Import (py_filename);
     PY_CHECK (py_module, "Could not import '%s'", extension_name);

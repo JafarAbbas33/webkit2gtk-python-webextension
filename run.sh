@@ -5,6 +5,7 @@
 #
 # Distributed under terms of the MIT license.
 #
-make -s
+make
 export PYTHONPATH=$(pwd)
-exec ./browse-with-extension "$@"
+export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libpython3.8.so
+./browse-with-extension
