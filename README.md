@@ -43,6 +43,11 @@ fpaths = [op.join(v[pv], v['LDLIBRARY']) for pv in ('LIBDIR', 'LIBPL')];
 print(list(filter(op.exists, fpaths))[0])
 ```
 
+For developing extensions, following packages are required:
+```sudo apt install libwebkit2gtk-4.0-dev
+sudo apt install python-gi-dev
+```
+
 Trying it out
 -------------
 
@@ -55,3 +60,6 @@ headers and libraries:
 * GNU Make.
 * `pkg-config`
 
+Additional tutorial
+-------------
+[Igalia blog link](https://blogs.igalia.com/carlosgc/2013/09/10/webkit2gtk-web-process-extensions/)
